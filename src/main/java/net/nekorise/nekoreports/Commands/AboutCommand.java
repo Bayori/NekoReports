@@ -16,7 +16,7 @@ public class AboutCommand implements CommandExecutor
     {
 
         sender.sendMessage(HEX.ApplyColor("&#ff7700NekoReports v" + NekoReports.getPlugin().getDescription().getVersion() + "\n&#ff7700by Nekorise"));
-        
+
 
         return true;
     }
