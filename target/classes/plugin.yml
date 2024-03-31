@@ -1,0 +1,22 @@
+name: NekoReports
+version: '0.1'
+main: net.nekorise.nekoreports.NekoReports
+api-version: '1.20'
+prefix: NekoReports
+authors: [Nekorise]
+description: Add simple report-system
+commands:
+  nekoreports:
+    aliases: nekor
+  report:
+    description: Report a player
+    permission: nekoreports.hasreport
+  reportcheck:
+    description: Allows to check the list of reports
+    permission: nekoreports.check
+  reportdelete:
+    description: Allows to delete reports form DB
+    permission: nekoreports.delete
+  reportchange:
+    description: Allows to change reports status
+    permission: nekoreports.change
