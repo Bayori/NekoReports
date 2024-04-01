@@ -1,0 +1,40 @@
+mySQL:
+  host: 'localhost'
+  port: '3306'
+  login: 'root'
+  password: ''
+  main-schema: 'nekoreports'
+  main-table: 'report_list'
+
+messages:
+
+  report:
+    usage: "&#ed471bИспользование: /report <Ник> <Причина>"
+    many-symbols: "&#ed471bКоличество символов в причине жалобы не должно превышать 150."
+    owner: "&#ff7700Подал: &#ffcb00"
+    reported-player: "&#ff7700Обвиняемый: &#ffcb00"
+    reason: "&#ff7700Причина: &#ffcb00"
+    date: "&#ff7700Дата: &#ffcb00"
+    status: "&#ff7700Статус: "
+    true-status: "&#1fe9a4Решено"
+    false-status: "&#eb531eНе решено"
+    player-notify: "&#ff7700Жалоба на игрока &#ffcb00%reportedPlayer% &#ff7700подана.\nАдминистрация сервера будет уведомлена."
+    admin-notify: "Новый репорт!"
+
+  report-change:
+    usage: "&#ed471bИспользование: /reportchange <ID репорта> <true/false>"
+    not-exists: "&#ed471bЗапись с таким ID отсутствует в базе данных."
+    suc-changed: "&#ff7700Статус репорта %report-ID% был изменён на "
+
+  delete:
+    usage: "&#ed471bИспользование: /reportdelete <ID репорта>"
+    full-delete: "&4База данных NekoReports была полностью очищена пользователем "
+    not-exists: "&#ed471bЗапись с таким ID отсутствует в базе данных."
+    suc-delete: "&#1fe9a4Запись с ID %report-ID% была удалена из базы данных!"
+
+  check:
+    zero-reports: "&#eb531eРепортов нет!"
+    invalid-page-symbol: "&#ed471bСтраница должна быть числом"
+    not-exist-page: "&#ed471bСтраницы не существует"
+    page-text: " Страница "
+    page-title: " Список репортов (Всего %reports-count%) "

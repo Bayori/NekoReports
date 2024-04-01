@@ -11,13 +11,13 @@ import java.util.List;
 public class MySQLConnection {
 
     // URL, ЛОГИН, ПАРОЛЬ
-    private static final String url = "jdbc:mysql://localhost:3306/";
-    private static final String user = "Bayori";
-    private static final String password = "Papika27";
+    private static String url = "jdbc:mysql://localhost:3306/";
+    private static String user = "root";
+    private static String password = "";
 
-    private static final String Schema = "nekoreports";
-    private static final String Table = "report_list";
-    private static final String EndAdress = Schema + "." + Table;
+    private static String Schema = "nekoreports";
+    private static String Table = "report_list";
+    private static String EndAdress = Schema + "." + Table;
 
     // JDBC поля для создания и управления соединением
     private static Connection con;
@@ -26,6 +26,8 @@ public class MySQLConnection {
 
     public static String getCount() // Вернуть количество записей в таблице
     {
+        FillFields();
+
         String query = "select count(*) from " + EndAdress + ";";
 
         try {
@@ -45,7 +47,7 @@ public class MySQLConnection {
 
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
-            return "&#ed471bОшибка соединения с БД, проверьте консоль.";
+            return "Error. Check console.";
         } finally {
             //close connection ,stmt and resultset here
             try { con.close(); } catch(SQLException se) { /*can't do anything */ }
@@ -57,6 +59,7 @@ public class MySQLConnection {
 
     public static String addReportToDB(@NotNull String senderName, @NotNull String reportedName, String reason)
     {
+        FillFields();
         String query = "INSERT INTO " + EndAdress + " (username, reportedUsername, reason) " +
                 "VALUES " +
                 "('" + senderName + "', " + // Ник подающего
@@ -73,11 +76,14 @@ public class MySQLConnection {
             // executing INSERT query
             stmt.executeUpdate(query);
 
-            return  HEX.ApplyColor("&#ff7700Жалоба на игрока &#ffcb00" + reportedName + " &#ff7700подана.\nАдминистрация сервера будет уведомлена.");
+            String returnMessage = LoadFromCfg("messages.report.player-notify");
+            returnMessage = returnMessage.replace("%reportedPlayer%", reportedName);
+
+            return HEX.ApplyColor(returnMessage);
 
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
-            return "Ошибка соединения с БД, проверьте консоль.";
+            return "Error. Check console.";
         } finally {
             //close connection ,stmt and resultset here
             try { con.close(); } catch(SQLException se) { /*can't do anything */ }
@@ -87,8 +93,8 @@ public class MySQLConnection {
 
     public static List<String> reportsList(CommandSender sender)
     {
+        FillFields();
         String query = "SELECT ID, username, reportedUsername, reason, reportDate, solved FROM " + EndAdress + ";";
-        System.out.println(query);
 
         List<String> output = new ArrayList<>();
 
@@ -112,14 +118,14 @@ public class MySQLConnection {
                 String date = rs.getDate(5).toString();
                 Boolean solved = rs.getBoolean(6);
 
-                String strStatus = solved ? "&#1fe9a4Решено" : "&#eb531eНе решено";;
+                String strStatus = solved ? LoadFromCfg("messages.report.true-status") : LoadFromCfg("messages.report.false-status");;
 
                 output.add("&#ff7700[&#ebd91eID: " + id + "&#ff7700] " +
-                        "\n&#ff7700Подал: &#ffcb00" + username +
-                        "\n&#ff7700Обвиняемый: &#ffcb00" + reportedUsername +
-                        "\n&#ff7700Причина: &#ffcb00" + reason +
-                        "\n&#ff7700Дата: &#ffcb00" + date +" "+ time +
-                        "\n&#ff7700Статус: " + strStatus);
+                        "\n" + LoadFromCfg("messages.report.owner") + username +
+                        "\n" + LoadFromCfg("messages.report.reported-player") + reportedUsername +
+                        "\n" + LoadFromCfg("messages.report.reason") + reason +
+                        "\n" + LoadFromCfg("messages.report.date") + date +" "+ time +
+                        "\n" + LoadFromCfg("messages.report.status") + strStatus);
             }
             return output;
 
@@ -137,6 +143,7 @@ public class MySQLConnection {
 
     public static boolean deleteReport(int ID)
     {
+        FillFields();
         String query = "DELETE FROM " + EndAdress + " WHERE `ID` = " + ID +";";
 
         try {
@@ -163,6 +170,7 @@ public class MySQLConnection {
 
     public static boolean checkEntry(int ID)
     {
+        FillFields();
         String query = "SELECT * FROM " + EndAdress + " WHERE `ID` = " + ID +";";
 
         try {
@@ -196,6 +204,7 @@ public class MySQLConnection {
 
     public static boolean deleteAll()
     {
+        FillFields();
         String query = "DELETE FROM " + EndAdress + ";";
 
         try {
@@ -222,6 +231,7 @@ public class MySQLConnection {
 
     public static boolean changeStatus(int ID, String status)
     {
+        FillFields();
         String query = "UPDATE " + EndAdress + " SET `solved` = " + status + " WHERE ID = " + ID + ";";
 
         try {
@@ -248,6 +258,7 @@ public class MySQLConnection {
 
     public static boolean checkTable()
     {
+        FillFields();
         String query = "SHOW DATABASES LIKE '" + Schema + "';";
 
         try {
@@ -269,6 +280,8 @@ public class MySQLConnection {
 
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(NekoReports.getPlugin());
+            Bukkit.getLogger().warning("Error when connecting to the database, check the correctness of the entered data in config.yml and the connection to the database yourself");
             return false;
         } finally {
             //close connection ,stmt and resultset here
@@ -280,9 +293,10 @@ public class MySQLConnection {
 
     public static boolean createSchemaTable()
     {
-        String query1 = "CREATE DATABASE " + Schema + ";";
+        FillFields();
+        String query1 = "CREATE DATABASE IF NOT EXISTS " + Schema + ";";
         String query2 =
-                "CREATE TABLE " + EndAdress + "(" +
+                "CREATE TABLE IF NOT EXISTS " + EndAdress + "(" +
                 "ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "username VARCHAR(40) NOT NULL," +
                 "reportedUsername VARCHAR(40) NOT NULL," +
@@ -292,6 +306,7 @@ public class MySQLConnection {
                 ");";
 
         try {
+
             // opening database connection to MySQL server
             con = DriverManager.getConnection(url, user, password);
 
@@ -315,6 +330,7 @@ public class MySQLConnection {
 
     public static boolean startupLogic()
     {
+        FillFields();
         try {
             // opening database connection to MySQL server
             con = DriverManager.getConnection(url, user, password);
@@ -324,11 +340,27 @@ public class MySQLConnection {
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(NekoReports.getPlugin());
-            Bukkit.getLogger().warning("Ошибка при подключении к БД, проверьте корректность введённых данных в config.yml и подключение к БД самостоятельно");
+            Bukkit.getLogger().warning("Error when connecting to the database, check the correctness of the entered data in config.yml and the connection to the database yourself");
             return false;
         } finally {
             //close connection ,stmt and resultset here
             try { con.close(); } catch(SQLException se) { /*can't do anything */ }
         }
+    }
+
+    public static void FillFields()
+    {
+        url = "jdbc:mysql://" + LoadFromCfg("mySQL.host");
+        url = url + ":" + LoadFromCfg("mySQL.port") + "/";
+        user = LoadFromCfg("mySQL.login");
+        password = LoadFromCfg("mySQL.password");
+        Schema = LoadFromCfg("mySQL.main-schema");
+        Table = LoadFromCfg("mySQL.main-table");
+        EndAdress = Schema + "." + Table;
+    }
+
+    public static String LoadFromCfg(String path)
+    {
+        return NekoReports.getPlugin().getConfig().getString(path);
     }
 }

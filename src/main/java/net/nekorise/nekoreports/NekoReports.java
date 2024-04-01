@@ -1,10 +1,7 @@
 package net.nekorise.nekoreports;
 
 import net.nekorise.nekoreports.Commands.*;
-import net.nekorise.nekoreports.utlis.HEX;
 import net.nekorise.nekoreports.utlis.MySQLConnection;
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class NekoReports extends JavaPlugin
@@ -16,6 +13,7 @@ public final class NekoReports extends JavaPlugin
     {
         plugin = this;
 
+        saveDefaultConfig();
         MySQLConnection.startupLogic();
 
         getCommand("nekoreports").setExecutor(new AboutCommand());
@@ -25,6 +23,7 @@ public final class NekoReports extends JavaPlugin
         getCommand("reportchange").setExecutor(new ChangeCommand());
 
         getLogger().info("Успешно запущено");
+
     }
 
     @Override

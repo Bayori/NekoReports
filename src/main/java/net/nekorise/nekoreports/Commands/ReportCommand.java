@@ -1,5 +1,6 @@
 package net.nekorise.nekoreports.Commands;
 
+import net.nekorise.nekoreports.NekoReports;
 import net.nekorise.nekoreports.utlis.HEX;
 import net.nekorise.nekoreports.utlis.MySQLConnection;
 import org.bukkit.Bukkit;
@@ -15,7 +16,7 @@ public class ReportCommand implements CommandExecutor {
 
         if (args.length <= 0) // Если аргументов 0, отменяем команду
         {
-            sender.sendMessage(HEX.ApplyColor("&#ed471bИспользование: /report <Ник> <Причина>"));
+            sender.sendMessage(HEX.ApplyColor(LoadFromCfg("messages.report.usage")));
             return false;
         }
 
@@ -23,7 +24,7 @@ public class ReportCommand implements CommandExecutor {
             String reason = getAllArgsAfterN(1, args);
             if (reason.length() > 150)
             {
-                sender.sendMessage(HEX.ApplyColor("&#ed471bКоличество символов в причине жалобы не должно превышать 150."));
+                sender.sendMessage(HEX.ApplyColor(HEX.ApplyColor(LoadFromCfg("messages.report.many-symbols"))));
                 return false;
             } else if (reason.length() <= 0)
             {
@@ -43,11 +44,11 @@ public class ReportCommand implements CommandExecutor {
         {
             if (admin.hasPermission("nekoreports.check"))
             {
-                admin.sendMessage(HEX.gradientText("\nНовый репорт!", HEX.parseHexColor("#f2ae1f"), HEX.parseHexColor("#f2581f")) +
+                admin.sendMessage(HEX.gradientText("\n" + MySQLConnection.LoadFromCfg("messages.report.admin-notify"), HEX.parseHexColor("#f2ae1f"), HEX.parseHexColor("#f2581f")) +
                                      HEX.ApplyColor(
-                                             "\n&#ff7700Подающий: &#ffcb00" + sender.getName() +
-                                                "\n&#ff7700Обвиняемый: &#ffcb00" + args[0] +
-                                                "\n&#ff7700Причина: &#ffcb00" + reason
+                                             "\n" + MySQLConnection.LoadFromCfg("messages.report.owner") + sender.getName() +
+                                                "\n" + MySQLConnection.LoadFromCfg("messages.report.reported-player") + args[0] +
+                                                "\n" + MySQLConnection.LoadFromCfg("messages.report.reason")+ reason
                 ));
             }
         }
@@ -63,5 +64,9 @@ public class ReportCommand implements CommandExecutor {
 
         // Строим строчку
         return sb.toString();
+    }
+    public static String LoadFromCfg(String path)
+    {
+        return NekoReports.getPlugin().getConfig().getString(path);
     }
 }

@@ -20,3 +20,5 @@ commands:
   reportchange:
     description: Allows to change reports status
     permission: nekoreports.change
+
+# nekoreports.admin - allows to reload configuration

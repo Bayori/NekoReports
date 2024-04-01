@@ -5,6 +5,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextColor;
+import net.nekorise.nekoreports.NekoReports;
 import net.nekorise.nekoreports.utlis.HEX;
 import net.nekorise.nekoreports.utlis.MySQLConnection;
 import org.bukkit.command.Command;
@@ -24,7 +25,7 @@ public class CheckCommand implements CommandExecutor {
 
         if (reportsList.size() <= 0)
         {
-            sender.sendMessage(HEX.ApplyColor("&#eb531eРепортов нет!"));
+            sender.sendMessage(HEX.ApplyColor(LoadFromCfg("messages.check.zero-reports")));
             return true;
         }
 
@@ -42,7 +43,7 @@ public class CheckCommand implements CommandExecutor {
                 page = Integer.parseInt(args[0]);
             }
             catch (Exception ex){
-                sender.sendMessage(HEX.ApplyColor("&#ed471bСтраница должна быть числом"));
+                sender.sendMessage(HEX.ApplyColor(LoadFromCfg("messages.check.invalid-page-symbol")));
             }
         }
 
@@ -60,7 +61,7 @@ public class CheckCommand implements CommandExecutor {
         // Проверка на корректность страницы
         if (page <= 0 || endIndex <= 0)
         {
-            sender.sendMessage(HEX.ApplyColor("&#ed471bСтраницы не существует"));
+            sender.sendMessage(HEX.ApplyColor(LoadFromCfg("messages.check.not-exists-page")));
 
             return false;
         }
@@ -100,7 +101,7 @@ public class CheckCommand implements CommandExecutor {
 
         // Сообщение номера страницы
         TextComponent PageText = Component
-                .text(" Страница " + page + " ")
+                .text(LoadFromCfg("messages.check.page-text") + page + " ")
                 .color(TextColor.color(182, 235, 30))
                 .clickEvent(ClickEvent.runCommand(""))
                 .hoverEvent(HoverEvent.showText(Component.empty()));
@@ -108,9 +109,13 @@ public class CheckCommand implements CommandExecutor {
         // Сборка кнопок и сообщения номера страницы в один компонент
         TextComponent FinalPageMessage = PrevPageMes.append(PageText).append(NextPageMes);
 
+
+        String pageTitle = LoadFromCfg("messages.check.page-title");
+        pageTitle = pageTitle.replace("%reports-count%", MySQLConnection.getCount());
+
         // Сообщение "Список репортов" с кнопками по бокам
         TextComponent ReportListText = Component
-                .text(" Список репортов (Всего " + MySQLConnection.getCount() + ") ")
+                .text(pageTitle)
                 .color(TextColor.color(182, 235, 30))
                 .clickEvent(ClickEvent.runCommand(""))
                 .hoverEvent(HoverEvent.showText(Component.empty()));
@@ -128,5 +133,9 @@ public class CheckCommand implements CommandExecutor {
         sender.sendMessage(FinalPageMessage);
 
         return true;
+    }
+    public static String LoadFromCfg(String path)
+    {
+        return NekoReports.getPlugin().getConfig().getString(path);
     }
 }

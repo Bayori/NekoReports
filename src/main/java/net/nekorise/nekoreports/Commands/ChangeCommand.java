@@ -1,5 +1,6 @@
 package net.nekorise.nekoreports.Commands;
 
+import net.nekorise.nekoreports.NekoReports;
 import net.nekorise.nekoreports.utlis.HEX;
 import net.nekorise.nekoreports.utlis.MySQLConnection;
 import org.bukkit.command.Command;
@@ -14,27 +15,33 @@ public class ChangeCommand implements CommandExecutor {
 
         if (args.length <= 1)
         {
-            sender.sendMessage(HEX.ApplyColor("&#ed471bИспользование: /reportchange <ID репорта> <true/false>"));
+            sender.sendMessage(HEX.ApplyColor(LoadFromCfg("messages.report-change.usage")));
             return false;
         }
 
         if (!(args[1].equals("true") || args[1].equals("false")))
         {
-            sender.sendMessage(HEX.ApplyColor("&#ed471bИспользование: /reportchange <ID репорта> <true/false>"));
+            sender.sendMessage(HEX.ApplyColor(LoadFromCfg("messages.report-change.usage")));
             return false;
         }
 
         if (!MySQLConnection.checkEntry(Integer.parseInt(args[0])))
         {
-            sender.sendMessage(HEX.ApplyColor("&#ed471bЗапись с таким ID отсутствует в базе данных."));
+            sender.sendMessage(HEX.ApplyColor(LoadFromCfg("messages.report-change.not-exists")));
             return false;
         }
 
         if (MySQLConnection.changeStatus(Integer.parseInt(args[0]), args[1]))
         {
-            sender.sendMessage(HEX.ApplyColor("&#ff7700Статус репорта " + args[0] + " был изменён на "
-                    +  ((args[1].equals("true")) ? "&#1fe9a4Решено" : "&#eb531eНе решено")));
+            String message = LoadFromCfg("messages.report-change.suc-changed");
+            message = message.replace("%report-ID%", args[0]);
+            sender.sendMessage(HEX.ApplyColor(message
+                    +  ((args[1].equals("true")) ? LoadFromCfg("messages.report.true-status") : LoadFromCfg("messages.report.false-status"))));
         }
         return true;
+    }
+    public static String LoadFromCfg(String path)
+    {
+        return NekoReports.getPlugin().getConfig().getString(path);
     }
 }
