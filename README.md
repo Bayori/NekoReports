@@ -1,2 +1,1 @@
-# NekoReports
- Simple report system (Bukkit plugin)
+code in progress
