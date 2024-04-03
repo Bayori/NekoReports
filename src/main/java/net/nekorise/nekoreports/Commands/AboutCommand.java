@@ -1,13 +1,15 @@
 package net.nekorise.nekoreports.Commands;
 
+
 import net.nekorise.nekoreports.NekoReports;
 import net.nekorise.nekoreports.utlis.HEX;
 import net.nekorise.nekoreports.utlis.ReloadConfig;
-import org.bukkit.Bukkit;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.permissions.Permission;
+
+
 import org.jetbrains.annotations.NotNull;
 
 public class AboutCommand implements CommandExecutor
@@ -24,7 +26,6 @@ public class AboutCommand implements CommandExecutor
         }
 
         sender.sendMessage(HEX.ApplyColor("&#ff7700NekoReports v" + NekoReports.getPlugin().getDescription().getVersion() + "\n&#ff7700by Nekorise"));
-
         return true;
     }
 }

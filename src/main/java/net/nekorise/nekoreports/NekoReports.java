@@ -16,13 +16,29 @@ public final class NekoReports extends JavaPlugin
         saveDefaultConfig();
         MySQLConnection.startupLogic();
 
+        // /nekor
         getCommand("nekoreports").setExecutor(new AboutCommand());
+        getCommand("nekoreports").setTabCompleter(new AboutTabCompleter());
+
+        // /report
         getCommand("report").setExecutor(new ReportCommand());
+        getCommand("report").setTabCompleter(new ReportTabCompleter());
+
+        // /reportcheck
         getCommand("reportcheck").setExecutor(new CheckCommand());
+        getCommand("reportcheck").setTabCompleter(new CheckTabCompleter());
+
+
+        // /reportdelete
         getCommand("reportdelete").setExecutor(new DeleteCommand());
+        getCommand("reportdelete").setTabCompleter(new DeleteTabCompleter());
+
+        // /reportchange
         getCommand("reportchange").setExecutor(new ChangeCommand());
+        getCommand("reportchange").setTabCompleter(new ChangeTabCompleter());
 
         getLogger().info("Успешно запущено");
+
 
     }
 
